@@ -3,23 +3,34 @@ import BlogList from './blogList';
 const Home = () => {
 const [blogs, setBlogs] = useState(null);
 const [isPending, setIsPending] = useState(true);
+const [error, setError] = useState(null);
 const [name, setName] = useState('Abir');
 
 useEffect(()=>{
   setTimeout(() => {
     fetch('http://localhost:8000/blogs')
     .then(res => {
+        if(!res.ok){
+            throw Error('could not fetch the data for that resources')
+        }
      return res.json();
     })
     .then(data =>{
       setBlogs(data);
       setIsPending(false);
-    });
+      setError(null);
+
+    })
+    .catch(err =>{
+        setIsPending(false);
+        setError(err.message);
+    })
   }, 1000);
 }, [])
 return(
     <div className="home">
-  {isPending && <div>Loading....</div>}      
+  {isPending && <div>Loading....</div>} 
+  {error && error};     
  {blogs && <BlogList blogs={blogs} title="All Blogs"/>}
  {blogs && <BlogList blogs={blogs.filter((blog)=>blog.author === "abir")} title="Abir Blogs"/> }
   <button onClick={()=>setName('Abir Hasan')}>Abir Click</button>  
