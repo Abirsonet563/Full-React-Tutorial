@@ -1,41 +1,18 @@
-import {useState, useEffect} from 'react';
-import BlogList from './blogList';
+import {useEffect, useState} from "react";
+import BlogList from "./BlogList";
+import useFetch from "./useFetch";
+
 const Home = () => {
-const [blogs, setBlogs] = useState(null);
-const [isPending, setIsPending] = useState(true);
-const [error, setError] = useState(null);
-const [name, setName] = useState('Abir');
+const {error, isPending, data: blogs} = useFetch('http://localhost:8000/blogs')
 
-useEffect(()=>{
-  setTimeout(() => {
-    fetch('http://localhost:8000/blogs')
-    .then(res => {
-        if(!res.ok){
-            throw Error('could not fetch the data for that resources')
-        }
-     return res.json();
-    })
-    .then(data =>{
-      setBlogs(data);
-      setIsPending(false);
-      setError(null);
-
-    })
-    .catch(err =>{
-        setIsPending(false);
-        setError(err.message);
-    })
-  }, 1000);
-}, [])
 return(
-    <div className="home">
+  <div className="home">
+  {error && <div>{error}</div>}     
   {isPending && <div>Loading....</div>} 
-  {error && error};     
- {blogs && <BlogList blogs={blogs} title="All Blogs"/>}
- {blogs && <BlogList blogs={blogs.filter((blog)=>blog.author === "abir")} title="Abir Blogs"/> }
-  <button onClick={()=>setName('Abir Hasan')}>Abir Click</button>  
-  <h1>{name}</h1>
+ {blogs && <BlogList blogs={blogs}/>}
     </div>
-)
+);
 }
+
+
 export default Home;
